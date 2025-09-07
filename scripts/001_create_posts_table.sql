@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS posts (
   tags TEXT[], -- Array of tags
   status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
   featured BOOLEAN DEFAULT false,
+  background_color TEXT DEFAULT '#000000',
+  opacity INTEGER DEFAULT 100,
+  sort_order INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   published_at TIMESTAMP WITH TIME ZONE
@@ -20,6 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_posts_status ON posts(status);
 CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
 CREATE INDEX IF NOT EXISTS idx_posts_published_at ON posts(published_at);
 CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category);
+CREATE INDEX IF NOT EXISTS idx_posts_sort_order ON posts(sort_order);
 
 -- Create function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
