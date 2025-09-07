@@ -5,8 +5,8 @@ import { Tag } from "lucide-react"
 import { parseMarkdown } from "@/lib/utils/markdown"
 import { BackButton } from "@/components/back-button"
 
-// Revalidate every 60 seconds in production, or disable caching in development
-export const revalidate = process.env.NODE_ENV === 'development' ? 0 : 60
+// Force dynamic rendering to avoid build-time data fetching
+export const dynamic = 'force-dynamic'
 
 
 interface PostPageProps {
@@ -98,11 +98,8 @@ export default async function PostPage({ params }: PostPageProps) {
   )
 }
 
-// Generate static params for all published posts
-export async function generateStaticParams() {
-  const posts = await getPosts({ status: "published" })
-
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
-}
+// Disabled for build compatibility - using dynamic routing instead
+// export async function generateStaticParams() {
+//   const posts = await getPosts({ status: "published" })
+//   return posts.map((post) => ({ slug: post.slug }))
+// }
