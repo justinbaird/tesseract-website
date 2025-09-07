@@ -9,6 +9,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  trailingSlash: false,
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
+  },
   // async headers() {
   //   return [
   //     {

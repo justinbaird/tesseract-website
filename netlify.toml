@@ -4,7 +4,6 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  NPM_FLAGS = "--prefix=/opt/buildhome/.nodejs/node-v$NODE_VERSION-linux-x64"
   
 [[headers]]
   for = "/*"

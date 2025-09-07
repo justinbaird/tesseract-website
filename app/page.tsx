@@ -6,36 +6,9 @@ import { getPosts } from "@/lib/posts"
 import { getPageBySlug } from "@/lib/pages"
 import { PageRenderer } from "@/components/page-renderer"
 
-// Force dynamic rendering to avoid build-time data fetching
-export const dynamic = 'force-dynamic'
-
-export default async function Home() {
-  let dynamicHomepage = null
-  let posts = []
-  
-  // Only try to fetch data if we have valid Supabase configuration
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL && 
-      process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://your-project-id.supabase.co') {
-    try {
-      dynamicHomepage = await getPageBySlug("home")
-    } catch (error) {
-      console.log("[v0] Failed to fetch dynamic homepage, falling back to static layout:", error)
-    }
-
-    // If there's a dynamic homepage, render it
-    if (dynamicHomepage) {
-      return <PageRenderer page={dynamicHomepage} />
-    }
-
-    try {
-      posts = await getPosts({ status: "published" })
-    } catch (error) {
-      console.log("[v0] Failed to fetch posts, using empty array:", error)
-      posts = []
-    }
-  } else {
-    console.log("[v0] Supabase not configured, using static fallback")
-  }
+export default function Home() {
+  // Use static fallback during build - no database calls
+  const posts: any[] = []
 
   return (
     <div className="min-h-screen text-white relative overflow-hidden">
