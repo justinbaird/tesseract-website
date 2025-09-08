@@ -7,6 +7,7 @@ import { PostsList } from "@/components/admin/posts-list"
 import { PageList } from "@/components/admin/page-list"
 import { SimpleAuth } from "@/components/admin/simple-auth"
 import { ProfileImageUpload } from "@/components/admin/profile-image-upload"
+import { ProfileSettingsEditor } from "@/components/admin/profile-settings-editor"
 import { Button } from "@/components/ui/button"
 import { Plus, FileText, Edit, LogOut, User, Home } from "lucide-react"
 import Link from "next/link"
@@ -172,6 +173,9 @@ export default function AdminPage() {
             <div className="bg-[#1a1a1a] rounded-lg border border-gray-800">
               <div className="p-6 space-y-8">
                 <ProfileImageUpload currentImageUrl={profileImageUrl} onImageUploaded={handleProfileImageUploaded} />
+                <div className="border-t border-gray-800 pt-8">
+                  <ProfileSettingsEditor />
+                </div>
               </div>
             </div>
           </TabsContent>

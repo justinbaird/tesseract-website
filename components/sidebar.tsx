@@ -99,6 +99,13 @@ export function Sidebar() {
   const [imageError, setImageError] = useState(false)
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false)
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
+  const [profileData, setProfileData] = useState({ 
+    name: 'Justin Baird', 
+    title: 'Creative Technologist',
+    linkedin_url: 'https://www.linkedin.com/in/justinbaird/',
+    instagram_url: 'https://www.instagram.com/justinbaird.sg/',
+    youtube_url: 'https://www.youtube.com/@Tesseract-Art'
+  })
 
   useEffect(() => {
     const loadPages = async () => {
@@ -126,6 +133,33 @@ export function Sidebar() {
       setProfileImageUrl("https://abomabdabkstyvllkosz.supabase.co/storage/v1/object/public/images/1755879481289-22hozxm6eyl.avif")
     }
 
+    // Load profile data
+    const loadProfileData = async () => {
+      try {
+        console.log('[v0] Sidebar: Loading profile data')
+        const response = await fetch('/api/profile')
+        if (response.ok) {
+          const data = await response.json()
+          console.log('[v0] Sidebar: Received profile data:', data)
+          const newProfileData = { 
+            name: data.name !== null && data.name !== undefined ? data.name : 'Justin Baird', 
+            title: data.title !== null && data.title !== undefined ? data.title : 'Creative Technologist',
+            linkedin_url: data.linkedin_url !== null && data.linkedin_url !== undefined ? data.linkedin_url : 'https://www.linkedin.com/in/justinbaird/',
+            instagram_url: data.instagram_url !== null && data.instagram_url !== undefined ? data.instagram_url : 'https://www.instagram.com/justinbaird.sg/',
+            youtube_url: data.youtube_url !== null && data.youtube_url !== undefined ? data.youtube_url : 'https://www.youtube.com/@Tesseract-Art'
+          }
+          console.log('[v0] Sidebar: Setting profile data to:', newProfileData)
+          setProfileData(newProfileData)
+        } else {
+          console.error('[v0] Sidebar: Failed to fetch profile data, status:', response.status)
+        }
+      } catch (error) {
+        console.error('[v0] Sidebar: Error loading profile data:', error)
+        // Keep defaults
+      }
+    }
+    loadProfileData()
+
     // Check admin authentication status
     const checkAdminAuth = () => {
       try {
@@ -151,10 +185,23 @@ export function Sidebar() {
       setImageError(false)
     }
 
+    const handleProfileSettingsUpdate = (event: CustomEvent) => {
+      const updatedProfile = event.detail
+      setProfileData({
+        name: updatedProfile.name !== null && updatedProfile.name !== undefined ? updatedProfile.name : 'Justin Baird',
+        title: updatedProfile.title !== null && updatedProfile.title !== undefined ? updatedProfile.title : 'Creative Technologist',
+        linkedin_url: updatedProfile.linkedin_url !== null && updatedProfile.linkedin_url !== undefined ? updatedProfile.linkedin_url : 'https://www.linkedin.com/in/justinbaird/',
+        instagram_url: updatedProfile.instagram_url !== null && updatedProfile.instagram_url !== undefined ? updatedProfile.instagram_url : 'https://www.instagram.com/justinbaird.sg/',
+        youtube_url: updatedProfile.youtube_url !== null && updatedProfile.youtube_url !== undefined ? updatedProfile.youtube_url : 'https://www.youtube.com/@Tesseract-Art'
+      })
+    }
+
     window.addEventListener("profileImageUpdated", handleProfileImageUpdate as EventListener)
+    window.addEventListener("profileSettingsUpdated", handleProfileSettingsUpdate as EventListener)
 
     return () => {
       window.removeEventListener("profileImageUpdated", handleProfileImageUpdate as EventListener)
+      window.removeEventListener("profileSettingsUpdated", handleProfileSettingsUpdate as EventListener)
       window.removeEventListener("storage", handleStorageChange)
       clearInterval(authCheckInterval)
     }
@@ -232,8 +279,12 @@ export function Sidebar() {
                 <span className="text-xl font-bold">JB</span>
               </div>
             )}
-            <h2 className="text-xl font-bold mb-1">Justin Baird</h2>
-            <p className="text-gray-400 text-sm">Creative Technologist</p>
+            {profileData.name && profileData.name.trim() && (
+              <h2 className="text-xl font-bold mb-1">{profileData.name}</h2>
+            )}
+            {profileData.title && profileData.title.trim() && (
+              <p className="text-gray-400 text-sm">{profileData.title}</p>
+            )}
           </div>
 
           </div>
@@ -323,27 +374,39 @@ export function Sidebar() {
             <div className="border-t border-white/10 pt-4">
               <p className="text-xs text-gray-500 mb-4">FOLLOW ME</p>
               <div className="space-y-2">
-                <a
-                  href="https://www.linkedin.com/in/justinbaird/"
-                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  <LinkedinIcon />
-                  LinkedIn
-                </a>
-                <a
-                  href="https://www.instagram.com/justinbaird.sg/"
-                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  <InstagramIcon />
-                  Instagram
-                </a>
-                <a
-                  href="https://www.youtube.com/@Tesseract-Art"
-                  className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-                >
-                  <YoutubeIcon />
-                  YouTube
-                </a>
+                {profileData.linkedin_url && profileData.linkedin_url.trim() && (
+                  <a
+                    href={profileData.linkedin_url}
+                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <LinkedinIcon />
+                    LinkedIn
+                  </a>
+                )}
+                {profileData.instagram_url && profileData.instagram_url.trim() && (
+                  <a
+                    href={profileData.instagram_url}
+                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <InstagramIcon />
+                    Instagram
+                  </a>
+                )}
+                {profileData.youtube_url && profileData.youtube_url.trim() && (
+                  <a
+                    href={profileData.youtube_url}
+                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <YoutubeIcon />
+                    YouTube
+                  </a>
+                )}
               </div>
               
               {/* Admin link - only show if authenticated */}
