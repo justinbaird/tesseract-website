@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Playfair_Display } from "next/font/google"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 const inter = Inter({
@@ -46,6 +47,7 @@ export default function RootLayout({
           }}
         />
         <div className="relative z-10">{children}</div>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   )
