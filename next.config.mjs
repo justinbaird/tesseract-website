@@ -9,9 +9,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  trailingSlash: false,
-  generateBuildId: async () => {
-    return 'build-' + Date.now()
+  experimental: {
+    serverComponentsExternalPackages: ['sharp']
   },
   // async headers() {
   //   return [
