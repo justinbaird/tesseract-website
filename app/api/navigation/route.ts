@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { getHierarchicalPages } from "@/lib/pages"
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   // Return empty array during build if Supabase isn't configured
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || 

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server"
 import { getHierarchicalPages } from "@/lib/pages"
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     console.log("[v0] GET /api/pages/hierarchical - Fetching hierarchical pages")
