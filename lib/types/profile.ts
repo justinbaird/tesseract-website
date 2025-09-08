@@ -12,6 +12,7 @@ export interface ProfileData {
   linkedin_url: string | null
   instagram_url: string | null
   youtube_url: string | null
+  background_image_url: string | null
 }
 
-export type ProfileSettingKey = 'profile_name' | 'profile_title' | 'linkedin_url' | 'instagram_url' | 'youtube_url'
+export type ProfileSettingKey = 'profile_name' | 'profile_title' | 'linkedin_url' | 'instagram_url' | 'youtube_url' | 'background_image_url'

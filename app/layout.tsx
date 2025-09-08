@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Playfair_Display } from "next/font/google"
 import { Toaster } from "sonner"
+import { BackgroundProvider } from "@/components/background-provider"
 import "./globals.css"
 
 const inter = Inter({
@@ -40,14 +41,16 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans">
-        <div
-          className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
-          style={{
-            backgroundImage: "url(/web-background.jpg)",
-          }}
-        />
-        <div className="relative z-10">{children}</div>
-        <Toaster richColors position="top-right" />
+        <BackgroundProvider>
+          <div
+            className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
+            style={{
+              backgroundImage: "var(--background-image-url, url(/web-background.jpg))",
+            }}
+          />
+          <div className="relative z-10">{children}</div>
+          <Toaster richColors position="top-right" />
+        </BackgroundProvider>
       </body>
     </html>
   )

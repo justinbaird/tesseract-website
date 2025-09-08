@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Save, User, Briefcase, Linkedin, Instagram, Youtube } from "lucide-react"
 import { toast } from "sonner"
 import type { ProfileData } from "@/lib/types/profile"
+import { BackgroundImageUpload } from "@/components/admin/background-image-upload"
 
 interface ProfileSettingsEditorProps {
   onProfileUpdated?: (profile: ProfileData) => void
@@ -18,7 +19,8 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
     title: '',
     linkedin_url: '',
     instagram_url: '',
-    youtube_url: ''
+    youtube_url: '',
+    background_image_url: ''
   })
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -41,7 +43,8 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
         title: data.title || '',
         linkedin_url: data.linkedin_url || '',
         instagram_url: data.instagram_url || '',
-        youtube_url: data.youtube_url || ''
+        youtube_url: data.youtube_url || '',
+        background_image_url: data.background_image_url || ''
       })
     } catch (error) {
       console.error('[v0] Failed to load profile data:', error)
@@ -79,7 +82,8 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
         title: updatedProfile.title || '',
         linkedin_url: updatedProfile.linkedin_url || '',
         instagram_url: updatedProfile.instagram_url || '',
-        youtube_url: updatedProfile.youtube_url || ''
+        youtube_url: updatedProfile.youtube_url || '',
+        background_image_url: updatedProfile.background_image_url || ''
       })
 
       // Notify parent component and trigger sidebar update
@@ -117,6 +121,10 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
 
   const handleYouTubeChange = (value: string) => {
     setProfileData(prev => ({ ...prev, youtube_url: value }))
+  }
+
+  const handleBackgroundImageChange = (url: string) => {
+    setProfileData(prev => ({ ...prev, background_image_url: url }))
   }
 
   if (isLoading) {
@@ -218,6 +226,13 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
             className="bg-[#0a0a0a] border-gray-700 text-white placeholder:text-gray-500 focus:border-[#00ff88] focus:ring-[#00ff88]"
           />
         </div>
+      </div>
+
+      <div className="pt-6 border-t border-gray-800">
+        <BackgroundImageUpload 
+          currentImageUrl={profileData.background_image_url || '/web-background.jpg'}
+          onImageUploaded={handleBackgroundImageChange}
+        />
       </div>
 
       <div className="pt-4 border-t border-gray-800">

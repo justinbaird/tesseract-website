@@ -9,7 +9,7 @@ export async function getProfileSettings(): Promise<ProfileData> {
     const { data, error } = await supabase
       .from('profile_settings')
       .select('setting_key, setting_value')
-      .in('setting_key', ['profile_name', 'profile_title', 'linkedin_url', 'instagram_url', 'youtube_url'])
+      .in('setting_key', ['profile_name', 'profile_title', 'linkedin_url', 'instagram_url', 'youtube_url', 'background_image_url'])
       .order('setting_key')
 
     if (error) {
@@ -20,7 +20,8 @@ export async function getProfileSettings(): Promise<ProfileData> {
         title: 'Creative Technologist',
         linkedin_url: 'https://www.linkedin.com/in/justinbaird/',
         instagram_url: 'https://www.instagram.com/justinbaird.sg/',
-        youtube_url: 'https://www.youtube.com/@Tesseract-Art'
+        youtube_url: 'https://www.youtube.com/@Tesseract-Art',
+        background_image_url: '/web-background.jpg'
       }
     }
 
@@ -33,7 +34,8 @@ export async function getProfileSettings(): Promise<ProfileData> {
       title: null,
       linkedin_url: null,
       instagram_url: null,
-      youtube_url: null
+      youtube_url: null,
+      background_image_url: null
     }
 
     data?.forEach((setting: ProfileSetting) => {
@@ -53,6 +55,9 @@ export async function getProfileSettings(): Promise<ProfileData> {
         case 'youtube_url':
           profileData.youtube_url = setting.setting_value
           break
+        case 'background_image_url':
+          profileData.background_image_url = setting.setting_value
+          break
       }
     })
 
@@ -62,7 +67,8 @@ export async function getProfileSettings(): Promise<ProfileData> {
       title: profileData.title !== null ? profileData.title : 'Creative Technologist',
       linkedin_url: profileData.linkedin_url !== null ? profileData.linkedin_url : 'https://www.linkedin.com/in/justinbaird/',
       instagram_url: profileData.instagram_url !== null ? profileData.instagram_url : 'https://www.instagram.com/justinbaird.sg/',
-      youtube_url: profileData.youtube_url !== null ? profileData.youtube_url : 'https://www.youtube.com/@Tesseract-Art'
+      youtube_url: profileData.youtube_url !== null ? profileData.youtube_url : 'https://www.youtube.com/@Tesseract-Art',
+      background_image_url: profileData.background_image_url !== null ? profileData.background_image_url : '/web-background.jpg'
     }
     
     console.log('[v0] Profile data result:', result)
@@ -75,7 +81,8 @@ export async function getProfileSettings(): Promise<ProfileData> {
       title: 'Creative Technologist',
       linkedin_url: 'https://www.linkedin.com/in/justinbaird/',
       instagram_url: 'https://www.instagram.com/justinbaird.sg/',
-      youtube_url: 'https://www.youtube.com/@Tesseract-Art'
+      youtube_url: 'https://www.youtube.com/@Tesseract-Art',
+      background_image_url: '/web-background.jpg'
     }
   }
 }
@@ -152,6 +159,14 @@ export async function updateProfileSettings(profileData: ProfileData): Promise<v
       updates.push({
         setting_key: 'youtube_url',
         setting_value: profileData.youtube_url,
+        updated_at: new Date().toISOString()
+      })
+    }
+    
+    if (profileData.background_image_url !== null) {
+      updates.push({
+        setting_key: 'background_image_url',
+        setting_value: profileData.background_image_url,
         updated_at: new Date().toISOString()
       })
     }
