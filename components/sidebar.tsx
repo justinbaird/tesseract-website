@@ -128,10 +128,8 @@ export function Sidebar() {
     const savedProfileImage = localStorage.getItem("profileImageUrl")
     if (savedProfileImage) {
       setProfileImageUrl(savedProfileImage)
-    } else {
-      // Use the actual Justin Baird photo from Supabase storage
-      setProfileImageUrl("https://abomabdabkstyvllkosz.supabase.co/storage/v1/object/public/images/1755879481289-22hozxm6eyl.avif")
     }
+    // No fallback image - will show initials if no image is set
 
     // Load profile data
     const loadProfileData = async () => {
@@ -269,14 +267,14 @@ export function Sidebar() {
           <div className="mb-8">
             {!imageError && profileImageUrl ? (
               <img
-                src={profileImageUrl || "/placeholder.svg"}
-                alt="Justin Baird"
+                src={profileImageUrl}
+                alt="Profile"
                 className="w-16 h-16 rounded-full object-cover mb-4"
                 onError={() => setImageError(true)}
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 mb-4 flex items-center justify-center">
-                <span className="text-xl font-bold">JB</span>
+                <span className="text-xl font-bold text-white">JB</span>
               </div>
             )}
             {profileData.name && profileData.name.trim() && (

@@ -20,7 +20,7 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: "Justin Baird - Creative Technologist",
+  title: "Tesseract Art",
   description:
     "Senior Product Designer and UX/UI expert with 20+ years of experience in innovation, technology, product, management and strategy.",
   generator: "v0.app",
@@ -43,9 +43,9 @@ export default function RootLayout({
       <body className="font-sans">
         <BackgroundProvider>
           <div
-            className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
+            className="fixed inset-0 bg-cover bg-center bg-no-repeat bg-black z-0"
             style={{
-              backgroundImage: "var(--background-image-url, url(/web-background.jpg))",
+              backgroundImage: "var(--background-image-url)",
             }}
           />
           <div className="relative z-10">{children}</div>
