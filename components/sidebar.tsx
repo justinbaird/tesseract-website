@@ -100,11 +100,11 @@ export function Sidebar() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false)
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({})
   const [profileData, setProfileData] = useState({ 
-    name: 'Justin Baird', 
-    title: 'Creative Technologist',
-    linkedin_url: 'https://www.linkedin.com/in/justinbaird/',
-    instagram_url: 'https://www.instagram.com/justinbaird.sg/',
-    youtube_url: 'https://www.youtube.com/@Tesseract-Art'
+    name: null, 
+    title: null,
+    linkedin_url: null,
+    instagram_url: null,
+    youtube_url: null
   })
 
   useEffect(() => {
@@ -140,11 +140,11 @@ export function Sidebar() {
           const data = await response.json()
           console.log('[v0] Sidebar: Received profile data:', data)
           const newProfileData = { 
-            name: data.name !== null && data.name !== undefined ? data.name : 'Justin Baird', 
-            title: data.title !== null && data.title !== undefined ? data.title : 'Creative Technologist',
-            linkedin_url: data.linkedin_url !== null && data.linkedin_url !== undefined ? data.linkedin_url : 'https://www.linkedin.com/in/justinbaird/',
-            instagram_url: data.instagram_url !== null && data.instagram_url !== undefined ? data.instagram_url : 'https://www.instagram.com/justinbaird.sg/',
-            youtube_url: data.youtube_url !== null && data.youtube_url !== undefined ? data.youtube_url : 'https://www.youtube.com/@Tesseract-Art'
+            name: data.name || null, 
+            title: data.title || null,
+            linkedin_url: data.linkedin_url || null,
+            instagram_url: data.instagram_url || null,
+            youtube_url: data.youtube_url || null
           }
           console.log('[v0] Sidebar: Setting profile data to:', newProfileData)
           setProfileData(newProfileData)
@@ -186,11 +186,11 @@ export function Sidebar() {
     const handleProfileSettingsUpdate = (event: CustomEvent) => {
       const updatedProfile = event.detail
       setProfileData({
-        name: updatedProfile.name !== null && updatedProfile.name !== undefined ? updatedProfile.name : 'Justin Baird',
-        title: updatedProfile.title !== null && updatedProfile.title !== undefined ? updatedProfile.title : 'Creative Technologist',
-        linkedin_url: updatedProfile.linkedin_url !== null && updatedProfile.linkedin_url !== undefined ? updatedProfile.linkedin_url : 'https://www.linkedin.com/in/justinbaird/',
-        instagram_url: updatedProfile.instagram_url !== null && updatedProfile.instagram_url !== undefined ? updatedProfile.instagram_url : 'https://www.instagram.com/justinbaird.sg/',
-        youtube_url: updatedProfile.youtube_url !== null && updatedProfile.youtube_url !== undefined ? updatedProfile.youtube_url : 'https://www.youtube.com/@Tesseract-Art'
+        name: updatedProfile.name || null,
+        title: updatedProfile.title || null,
+        linkedin_url: updatedProfile.linkedin_url || null,
+        instagram_url: updatedProfile.instagram_url || null,
+        youtube_url: updatedProfile.youtube_url || null
       })
     }
 

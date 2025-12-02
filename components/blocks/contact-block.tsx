@@ -21,11 +21,16 @@ export function ContactBlock({ content }: ContactBlockProps) {
         {content.title && <h2 className="text-3xl md:text-4xl font-bold mb-8">{content.title}</h2>}
 
         <div className="space-y-6">
-          <p className="text-xl text-gray-300 mb-8">Get in touch with me directly via email</p>
-
-          <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
-            <a href="mailto:justin@justinbaird.com">Email Me: justin@justinbaird.com</a>
-          </Button>
+          {content.email && content.email.trim() ? (
+            <>
+              <p className="text-xl text-gray-300 mb-8">Get in touch with me directly via email</p>
+              <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
+                <a href={`mailto:${content.email}`}>Email Me: {content.email}</a>
+              </Button>
+            </>
+          ) : (
+            <p className="text-xl text-gray-300 mb-8">Contact information will be displayed here when configured.</p>
+          )}
         </div>
       </div>
     </section>

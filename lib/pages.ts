@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import type { Page, ContentBlock } from "@/lib/types/page"
 
 export async function getPages(): Promise<Page[]> {
@@ -92,7 +92,7 @@ export async function getPageById(id: string): Promise<Page | null> {
 }
 
 export async function createPage(pageData: Omit<Page, "id" | "created_at" | "updated_at">): Promise<Page> {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   // Extract content blocks from page data
   const { content_blocks, ...pageFields } = pageData
@@ -132,7 +132,7 @@ export async function updatePage(id: string, updates: Partial<Page>): Promise<Pa
   console.log("[v0] Page ID:", id)
   console.log("[v0] Updates:", JSON.stringify(updates, null, 2))
 
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from("pages")
@@ -151,7 +151,7 @@ export async function updatePage(id: string, updates: Partial<Page>): Promise<Pa
 }
 
 export async function deletePage(id: string): Promise<void> {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const { error } = await supabase.from("pages").delete().eq("id", id)
 
@@ -169,7 +169,7 @@ export async function updateContentBlocks(
   console.log("[v0] Blocks count:", blocks.length)
   console.log("[v0] Blocks data:", JSON.stringify(blocks, null, 2))
 
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   // Delete existing blocks
   console.log("[v0] Deleting existing content blocks...")
@@ -242,7 +242,7 @@ export async function getNavigationPages(): Promise<Page[]> {
 }
 
 export async function updatePageOrder(pageIds: string[]): Promise<void> {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const updates = pageIds.map((pageId, index) => supabase.from("pages").update({ sort_order: index }).eq("id", pageId))
 
@@ -254,7 +254,7 @@ export async function updatePageParent(pageId: string, parentId: string | null):
   console.log("[v0] Page ID:", pageId)
   console.log("[v0] Parent ID:", parentId)
   
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from("pages")

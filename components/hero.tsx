@@ -1,25 +1,62 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 
 export function Hero() {
+  const [profileData, setProfileData] = useState<{
+    name: string | null
+    title: string | null
+  }>({
+    name: null,
+    title: null
+  })
+
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        const response = await fetch('/api/profile')
+        if (response.ok) {
+          const data = await response.json()
+          setProfileData({
+            name: data.name || null,
+            title: data.title || null
+          })
+        }
+      } catch (error) {
+        console.error('Failed to load profile data:', error)
+      }
+    }
+    loadProfileData()
+
+    const handleProfileUpdate = (event: CustomEvent) => {
+      const updatedProfile = event.detail
+      setProfileData({
+        name: updatedProfile.name || null,
+        title: updatedProfile.title || null
+      })
+    }
+
+    window.addEventListener('profileSettingsUpdated', handleProfileUpdate as EventListener)
+    return () => {
+      window.removeEventListener('profileSettingsUpdated', handleProfileUpdate as EventListener)
+    }
+  }, [])
+
+  // Don't render if no profile data
+  if (!profileData.name && !profileData.title) {
+    return null
+  }
+
   return (
     <section id="home" className="min-h-screen flex items-center justify-center px-6 lg:px-12">
       <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-5xl lg:text-7xl font-bold mb-6">Justin Baird</h1>
-        <p className="text-xl lg:text-2xl text-gray-300 mb-4">Driving positive change through</p>
-        <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
-          I am a Senior Product Designer and UX/UI expert with 20+ years of experience in innovation, technology,
-          product, management and strategy.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button className="bg-white text-black hover:bg-gray-200">About</Button>
-          <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black bg-transparent">
-            Contact
-          </Button>
-          <Button variant="ghost" className="text-white hover:bg-white/10">
-            ✉ Email
-          </Button>
-        </div>
+        {profileData.name && (
+          <h1 className="text-5xl lg:text-7xl font-bold mb-6">{profileData.name}</h1>
+        )}
+        {profileData.title && (
+          <p className="text-xl lg:text-2xl text-gray-300 mb-8">{profileData.title}</p>
+        )}
       </div>
     </section>
   )

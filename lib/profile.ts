@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import type { ProfileData, ProfileSetting, ProfileSettingKey } from '@/lib/types/profile'
 
 export async function getProfileSettings(): Promise<ProfileData> {
@@ -14,14 +14,14 @@ export async function getProfileSettings(): Promise<ProfileData> {
 
     if (error) {
       console.error('[v0] Error fetching profile settings:', error)
-      // Return defaults on error
+      // Return empty values on error - no defaults
       return {
-        name: 'Justin Baird',
-        title: 'Creative Technologist',
-        linkedin_url: 'https://www.linkedin.com/in/justinbaird/',
-        instagram_url: 'https://www.instagram.com/justinbaird.sg/',
-        youtube_url: 'https://www.youtube.com/@Tesseract-Art',
-        background_image_url: '/web-background.jpg'
+        name: null,
+        title: null,
+        linkedin_url: null,
+        instagram_url: null,
+        youtube_url: null,
+        background_image_url: null
       }
     }
 
@@ -61,28 +61,28 @@ export async function getProfileSettings(): Promise<ProfileData> {
       }
     })
 
-    // Use defaults only if values are null/undefined (preserve empty strings)
+    // Return actual values from database - no defaults
     const result = {
-      name: profileData.name !== null ? profileData.name : 'Justin Baird',
-      title: profileData.title !== null ? profileData.title : 'Creative Technologist',
-      linkedin_url: profileData.linkedin_url !== null ? profileData.linkedin_url : 'https://www.linkedin.com/in/justinbaird/',
-      instagram_url: profileData.instagram_url !== null ? profileData.instagram_url : 'https://www.instagram.com/justinbaird.sg/',
-      youtube_url: profileData.youtube_url !== null ? profileData.youtube_url : 'https://www.youtube.com/@Tesseract-Art',
-      background_image_url: profileData.background_image_url !== null ? profileData.background_image_url : '/web-background.jpg'
+      name: profileData.name,
+      title: profileData.title,
+      linkedin_url: profileData.linkedin_url,
+      instagram_url: profileData.instagram_url,
+      youtube_url: profileData.youtube_url,
+      background_image_url: profileData.background_image_url
     }
     
     console.log('[v0] Profile data result:', result)
     return result
   } catch (error) {
     console.error('[v0] Failed to fetch profile settings:', error)
-    // Return defaults on error
+    // Return empty values on error - no defaults
     return {
-      name: 'Justin Baird', 
-      title: 'Creative Technologist',
-      linkedin_url: 'https://www.linkedin.com/in/justinbaird/',
-      instagram_url: 'https://www.instagram.com/justinbaird.sg/',
-      youtube_url: 'https://www.youtube.com/@Tesseract-Art',
-      background_image_url: '/web-background.jpg'
+      name: null, 
+      title: null,
+      linkedin_url: null,
+      instagram_url: null,
+      youtube_url: null,
+      background_image_url: null
     }
   }
 }
@@ -91,7 +91,7 @@ export async function updateProfileSetting(key: ProfileSettingKey, value: string
   try {
     console.log(`[v0] Updating profile setting: ${key} = ${value}`)
 
-    const supabase = createClient()
+    const supabase = createAdminClient()
     const { data, error } = await supabase
       .from('profile_settings')
       .upsert({
@@ -176,7 +176,7 @@ export async function updateProfileSettings(profileData: ProfileData): Promise<v
       return
     }
 
-    const supabase = createClient()
+    const supabase = createAdminClient()
     const { error } = await supabase
       .from('profile_settings')
       .upsert(updates, {

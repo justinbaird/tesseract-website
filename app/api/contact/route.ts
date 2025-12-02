@@ -14,8 +14,10 @@ export async function POST(request: NextRequest) {
     // Simple email sending using a service like Formspree, Netlify Forms, or similar
     // This is a placeholder - you'll need to configure your preferred email service
 
+    // Note: Configure your email service recipient in your email service settings
+    // This is a placeholder - configure your email service (Resend, SendGrid, etc.) with the recipient
     const emailData = {
-      to: "justin@justinbaird.com",
+      to: process.env.CONTACT_EMAIL || "contact@example.com", // Configure via environment variable
       from: email,
       subject: `New Contact Form Message from ${name}`,
       html: `

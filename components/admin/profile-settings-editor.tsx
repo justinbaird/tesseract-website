@@ -230,7 +230,7 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
 
       <div className="pt-6 border-t border-gray-800">
         <BackgroundImageUpload 
-          currentImageUrl={profileData.background_image_url || '/web-background.jpg'}
+          currentImageUrl={profileData.background_image_url || ''}
           onImageUploaded={handleBackgroundImageChange}
         />
       </div>

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient, createAdminClient } from "@/lib/supabase/server"
 import type { Post, CreatePostData, UpdatePostData } from "@/lib/types/post"
 
 // Get all posts with optional filtering
@@ -127,7 +127,7 @@ export async function getPostById(id: string) {
 
 // Create a new post
 export async function createPost(postData: CreatePostData) {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const { data, error } = await supabase
     .from("posts")
@@ -149,7 +149,7 @@ export async function createPost(postData: CreatePostData) {
 
 // Update an existing post
 export async function updatePost(postData: UpdatePostData) {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const updateData: any = { ...postData }
   delete updateData.id
@@ -172,7 +172,7 @@ export async function updatePost(postData: UpdatePostData) {
 
 // Delete a post
 export async function deletePost(id: string) {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const { error } = await supabase.from("posts").delete().eq("id", id)
 
@@ -214,7 +214,7 @@ export async function isSlugUnique(slug: string, excludeId?: string) {
 
 // Update post order
 export async function updatePostOrder(postIds: string[]): Promise<void> {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const updates = postIds.map((postId, index) => supabase.from("posts").update({ sort_order: index }).eq("id", postId))
 

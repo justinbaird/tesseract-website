@@ -87,11 +87,11 @@ export function BackgroundImageUpload({ currentImageUrl, onImageUploaded }: Back
   }
 
   const handleRemoveImage = () => {
-    onImageUploaded('/web-background.jpg') // Reset to default
-    toast.success('Background image reset to default')
+    onImageUploaded('') // Clear background image
+    toast.success('Background image removed')
   }
 
-  const isDefaultImage = currentImageUrl === '/web-background.jpg'
+  const isDefaultImage = false // No default image
 
   return (
     <div className="space-y-6">

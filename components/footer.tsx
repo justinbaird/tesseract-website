@@ -1,18 +1,53 @@
+"use client"
+
+import { useState, useEffect } from "react"
+
 export function Footer() {
+  const [profileData, setProfileData] = useState<{
+    name: string | null
+  }>({
+    name: null
+  })
+
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        const response = await fetch('/api/profile')
+        if (response.ok) {
+          const data = await response.json()
+          setProfileData({
+            name: data.name || null
+          })
+        }
+      } catch (error) {
+        console.error('Failed to load profile data:', error)
+      }
+    }
+    loadProfileData()
+
+    const handleProfileUpdate = (event: CustomEvent) => {
+      const updatedProfile = event.detail
+      setProfileData({
+        name: updatedProfile.name || null
+      })
+    }
+
+    window.addEventListener('profileSettingsUpdated', handleProfileUpdate as EventListener)
+    return () => {
+      window.removeEventListener('profileSettingsUpdated', handleProfileUpdate as EventListener)
+    }
+  }, [])
+
+  const currentYear = new Date().getFullYear()
+
   return (
     <footer className="py-12 px-6 lg:px-12 border-t border-white/10">
       <div className="max-w-6xl mx-auto text-center">
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-8 text-gray-400">
-          <a href="mailto:justin@justinbaird.com" className="hover:text-white transition-colors">
-            justin@justinbaird.com
-          </a>
-          <span className="hidden sm:block">•</span>
-          <a href="tel:+61893434" className="hover:text-white transition-colors">
-            +61 893 434
-          </a>
-          <span className="hidden sm:block">•</span>
-          <span>© 2024 Justin Baird</span>
-        </div>
+        {profileData.name && (
+          <div className="text-gray-400">
+            <span>© {currentYear} {profileData.name}</span>
+          </div>
+        )}
       </div>
     </footer>
   )

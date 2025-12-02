@@ -21,8 +21,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Tesseract Art",
-  description:
-    "Senior Product Designer and UX/UI expert with 20+ years of experience in innovation, technology, product, management and strategy.",
+  description: "Personal portfolio website",
   generator: "v0.app",
 }
 
@@ -45,7 +44,7 @@ export default function RootLayout({
           <div
             className="fixed inset-0 bg-cover bg-center bg-no-repeat bg-black z-0"
             style={{
-              backgroundImage: "var(--background-image-url)",
+              backgroundImage: "var(--background-image-url, none)",
             }}
           />
           <div className="relative z-10">{children}</div>
