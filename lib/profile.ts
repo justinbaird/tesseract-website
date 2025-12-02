@@ -123,58 +123,47 @@ export async function updateProfileSettings(profileData: ProfileData): Promise<v
 
     const updates = []
     
-    if (profileData.name !== null) {
-      updates.push({
-        setting_key: 'profile_name',
-        setting_value: profileData.name,
-        updated_at: new Date().toISOString()
-      })
-    }
+    // Always update all fields (including empty strings to clear them)
+    // Convert empty strings to null for consistency
+    updates.push({
+      setting_key: 'profile_name',
+      setting_value: profileData.name && profileData.name.trim() ? profileData.name.trim() : null,
+      updated_at: new Date().toISOString()
+    })
     
-    if (profileData.title !== null) {
-      updates.push({
-        setting_key: 'profile_title', 
-        setting_value: profileData.title,
-        updated_at: new Date().toISOString()
-      })
-    }
+    updates.push({
+      setting_key: 'profile_title',
+      setting_value: profileData.title && profileData.title.trim() ? profileData.title.trim() : null,
+      updated_at: new Date().toISOString()
+    })
     
-    if (profileData.linkedin_url !== null) {
-      updates.push({
-        setting_key: 'linkedin_url',
-        setting_value: profileData.linkedin_url,
-        updated_at: new Date().toISOString()
-      })
-    }
+    updates.push({
+      setting_key: 'linkedin_url',
+      setting_value: profileData.linkedin_url && profileData.linkedin_url.trim() ? profileData.linkedin_url.trim() : null,
+      updated_at: new Date().toISOString()
+    })
     
-    if (profileData.instagram_url !== null) {
-      updates.push({
-        setting_key: 'instagram_url',
-        setting_value: profileData.instagram_url,
-        updated_at: new Date().toISOString()
-      })
-    }
+    updates.push({
+      setting_key: 'instagram_url',
+      setting_value: profileData.instagram_url && profileData.instagram_url.trim() ? profileData.instagram_url.trim() : null,
+      updated_at: new Date().toISOString()
+    })
     
-    if (profileData.youtube_url !== null) {
-      updates.push({
-        setting_key: 'youtube_url',
-        setting_value: profileData.youtube_url,
-        updated_at: new Date().toISOString()
-      })
-    }
+    updates.push({
+      setting_key: 'youtube_url',
+      setting_value: profileData.youtube_url && profileData.youtube_url.trim() ? profileData.youtube_url.trim() : null,
+      updated_at: new Date().toISOString()
+    })
     
-    if (profileData.background_image_url !== null) {
+    if (profileData.background_image_url !== null && profileData.background_image_url !== undefined) {
       updates.push({
         setting_key: 'background_image_url',
-        setting_value: profileData.background_image_url,
+        setting_value: profileData.background_image_url && profileData.background_image_url.trim() ? profileData.background_image_url.trim() : null,
         updated_at: new Date().toISOString()
       })
     }
 
-    if (updates.length === 0) {
-      console.log('[v0] No profile updates to apply')
-      return
-    }
+    // Always apply updates (we're updating all profile fields)
 
     const supabase = createAdminClient()
     const { error } = await supabase

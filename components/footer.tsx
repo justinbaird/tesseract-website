@@ -12,7 +12,12 @@ export function Footer() {
   useEffect(() => {
     const loadProfileData = async () => {
       try {
-        const response = await fetch('/api/profile')
+        const response = await fetch(`/api/profile?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          }
+        })
         if (response.ok) {
           const data = await response.json()
           setProfileData({
@@ -31,10 +36,18 @@ export function Footer() {
         name: updatedProfile.name || null
       })
     }
+    
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'profileSettingsLastUpdated') {
+        loadProfileData()
+      }
+    }
 
     window.addEventListener('profileSettingsUpdated', handleProfileUpdate as EventListener)
+    window.addEventListener('storage', handleStorageChange)
     return () => {
       window.removeEventListener('profileSettingsUpdated', handleProfileUpdate as EventListener)
+      window.removeEventListener('storage', handleStorageChange)
     }
   }, [])
 

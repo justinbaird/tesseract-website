@@ -135,7 +135,13 @@ export function Sidebar() {
     const loadProfileData = async () => {
       try {
         console.log('[v0] Sidebar: Loading profile data')
-        const response = await fetch('/api/profile')
+        // Add cache busting
+        const response = await fetch(`/api/profile?t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+          }
+        })
         if (response.ok) {
           const data = await response.json()
           console.log('[v0] Sidebar: Received profile data:', data)
@@ -157,7 +163,7 @@ export function Sidebar() {
       }
     }
     loadProfileData()
-
+    
     // Check admin authentication status
     const checkAdminAuth = () => {
       try {
@@ -172,7 +178,16 @@ export function Sidebar() {
     
     // Check admin auth on mount and when storage changes
     checkAdminAuth()
-    const handleStorageChange = () => checkAdminAuth()
+    
+    // Combined storage handler for both profile updates and auth changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'profileSettingsLastUpdated') {
+        console.log('[v0] Sidebar: Profile settings updated, reloading data')
+        loadProfileData()
+      } else if (e.key === 'admin_authenticated') {
+        checkAdminAuth()
+      }
+    }
     window.addEventListener("storage", handleStorageChange)
     
     // Also check periodically in case auth changes in same tab

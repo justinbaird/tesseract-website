@@ -32,7 +32,12 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
   const loadProfileData = async () => {
     try {
       console.log('[v0] Loading profile data for editor')
-      const response = await fetch('/api/profile')
+      const response = await fetch(`/api/profile?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        }
+      })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -61,10 +66,12 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
     try {
       console.log('[v0] Saving profile data:', profileData)
       
-      const response = await fetch('/api/profile', {
+      // Add cache busting timestamp
+      const response = await fetch(`/api/profile?t=${Date.now()}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
         },
         body: JSON.stringify(profileData)
       })
@@ -89,10 +96,22 @@ export function ProfileSettingsEditor({ onProfileUpdated }: ProfileSettingsEdito
       // Notify parent component and trigger sidebar update
       onProfileUpdated?.(updatedProfile)
       
-      // Dispatch custom event to update sidebar
+      // Dispatch custom event to update sidebar and other components
       window.dispatchEvent(new CustomEvent('profileSettingsUpdated', { 
-        detail: updatedProfile 
+        detail: updatedProfile,
+        bubbles: true
       }))
+
+      // Also try to reload profile data in components that might not have received the event
+      // Force a page refresh of sidebar/profile components after a short delay
+      setTimeout(() => {
+        // Trigger a storage event that components can listen to
+        localStorage.setItem('profileSettingsLastUpdated', Date.now().toString())
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'profileSettingsLastUpdated',
+          newValue: Date.now().toString()
+        }))
+      }, 100)
 
       toast.success('Profile settings saved successfully!')
     } catch (error) {
