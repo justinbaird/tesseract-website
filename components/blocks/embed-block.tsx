@@ -9,6 +9,7 @@ const detectEmbedType = (url: string): string => {
   if (url.includes("vimeo.com")) return "vimeo"
   if (url.includes("twitter.com") || url.includes("x.com")) return "twitter"
   if (url.includes("codepen.io")) return "codepen"
+  if (url.includes("drive.google.com")) return "googledrive"
   return "iframe"
 }
 
@@ -25,6 +26,30 @@ const getEmbedUrl = (url: string, type: string): string => {
     case "codepen":
       const codepenUrl = url.replace("/pen/", "/embed/")
       return codepenUrl.includes("/embed/") ? codepenUrl : url
+
+    case "googledrive":
+      // Convert Google Drive sharing URL to embed URL
+      // Format: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+      // or: https://drive.google.com/open?id=FILE_ID
+      let fileId: string | null = null
+      
+      // Try to extract file ID from different Google Drive URL formats
+      const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+      if (fileIdMatch) {
+        fileId = fileIdMatch[1]
+      }
+      
+      if (fileId) {
+        // Check if it's a Google Docs, Sheets, or Slides file (different embed format)
+        if (url.includes('/document/') || url.includes('/spreadsheets/') || url.includes('/presentation/')) {
+          return url.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview')
+        }
+        // For regular files (PDFs, images, etc.)
+        return `https://drive.google.com/file/d/${fileId}/preview`
+      }
+      
+      // If we can't extract file ID, return original URL
+      return url
 
     default:
       return url

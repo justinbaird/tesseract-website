@@ -44,6 +44,72 @@ export function parseMarkdown(text: string): string {
     </div>`
   })
 
+  // Process Vimeo embeds
+  // Format: [vimeo](VIMEO_URL)
+  result = result.replace(/\[vimeo\]\((https:\/\/vimeo\.com\/(\d+)[^)]*)\)/g, (match, fullUrl, videoId) => {
+    console.log('[v0] Converting Vimeo embed:', videoId)
+    return `<div class="aspect-video rounded-lg overflow-hidden shadow-lg my-6">
+      <iframe src="https://player.vimeo.com/video/${videoId}" class="w-full h-full" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Vimeo video"></iframe>
+    </div>`
+  })
+
+  // Process direct video file embeds (MP4, WebM, etc.)
+  // Format: [video](VIDEO_URL)
+  result = result.replace(/\[video\]\((https?:\/\/[^)]+\.(?:mp4|webm|ogg|mov)[^)]*)\)/g, (match, url) => {
+    console.log('[v0] Converting video embed:', url)
+    return `<div class="aspect-video rounded-lg overflow-hidden shadow-lg my-6">
+      <video class="w-full h-full" controls>
+        <source src="${url}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>`
+  })
+
+  // Process Google Drive embeds
+  // Format 1: [googledrive](GOOGLE_DRIVE_URL)
+  result = result.replace(/\[googledrive\]\((https:\/\/drive\.google\.com\/[^)]+)\)/g, (match, url) => {
+    console.log('[v0] Converting Google Drive embed:', url)
+    // Extract file ID
+    let fileId: string | null = null
+    const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+    if (fileIdMatch) {
+      fileId = fileIdMatch[1]
+    }
+    
+    if (fileId) {
+      let embedUrl = `https://drive.google.com/file/d/${fileId}/preview`
+      // For Docs, Sheets, Slides use preview format
+      if (url.includes('/document/') || url.includes('/spreadsheets/') || url.includes('/presentation/')) {
+        embedUrl = url.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview')
+      }
+      return `<div class="w-full rounded-lg overflow-hidden shadow-lg my-6" style="height: 600px;">
+        <iframe src="${embedUrl}" class="w-full h-full" frameborder="0" allow="autoplay" allowfullscreen title="Google Drive document"></iframe>
+      </div>`
+    }
+    return match // Return original if we can't parse
+  })
+
+  // Format 2: ![googledrive](GOOGLE_DRIVE_URL) - image-like syntax
+  result = result.replace(/!\[googledrive\]\((https:\/\/drive\.google\.com\/[^)]+)\)/g, (match, url) => {
+    console.log('[v0] Converting Google Drive embed (format 2):', url)
+    let fileId: string | null = null
+    const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+    if (fileIdMatch) {
+      fileId = fileIdMatch[1]
+    }
+    
+    if (fileId) {
+      let embedUrl = `https://drive.google.com/file/d/${fileId}/preview`
+      if (url.includes('/document/') || url.includes('/spreadsheets/') || url.includes('/presentation/')) {
+        embedUrl = url.replace(/\/edit.*$/, '/preview').replace(/\/view.*$/, '/preview')
+      }
+      return `<div class="w-full rounded-lg overflow-hidden shadow-lg my-6" style="height: 600px;">
+        <iframe src="${embedUrl}" class="w-full h-full" frameborder="0" allow="autoplay" allowfullscreen title="Google Drive document"></iframe>
+      </div>`
+    }
+    return match
+  })
+
   // Process existing HTML links (don't double-process them)
   const existingHtmlLinks = result.match(/<a\s+[^>]*href\s*=\s*["'][^"']*["'][^>]*>.*?<\/a>/gi) || []
   console.log("[v0] Found existing HTML links:", existingHtmlLinks.length)
@@ -71,6 +137,10 @@ export function parseMarkdown(text: string): string {
       }
       // Skip if this is a YouTube embed that was already processed
       if (text.toLowerCase() === 'youtube') {
+        return
+      }
+      // Skip if this is a Google Drive embed that was already processed
+      if (text.toLowerCase() === 'googledrive') {
         return
       }
       console.log("[v0] Converting markdown link:", { text, url })

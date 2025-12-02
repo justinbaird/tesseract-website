@@ -49,15 +49,16 @@ export function ImageUpload({ onImageUploaded, currentImage, className }: ImageU
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      // Validate file type
+      // Validate file type (optional - allow all types now, but show warning for non-images)
       if (!file.type.startsWith("image/")) {
-        alert("Please select an image file")
-        return
+        if (!confirm("This doesn't appear to be an image file. Continue anyway?")) {
+          return
+        }
       }
 
-      // Validate file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        alert("Image must be less than 5MB")
+      // Validate file size (50MB max)
+      if (file.size > 50 * 1024 * 1024) {
+        alert("File must be less than 50MB")
         return
       }
 

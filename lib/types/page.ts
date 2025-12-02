@@ -120,7 +120,7 @@ export interface VideoContent extends BlockContent {
 export interface EmbedBlockContent extends BlockContent {
   title?: string
   url: string
-  embed_type?: "auto" | "youtube" | "vimeo" | "twitter" | "codepen" | "iframe"
+  embed_type?: "auto" | "youtube" | "vimeo" | "twitter" | "codepen" | "googledrive" | "iframe"
   width?: string
   height?: string
   allow_fullscreen?: boolean

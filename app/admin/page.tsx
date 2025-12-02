@@ -9,7 +9,8 @@ import { SimpleAuth } from "@/components/admin/simple-auth"
 import { ProfileImageUpload } from "@/components/admin/profile-image-upload"
 import { ProfileSettingsEditor } from "@/components/admin/profile-settings-editor"
 import { Button } from "@/components/ui/button"
-import { Plus, FileText, Edit, LogOut, User, Home } from "lucide-react"
+import { Plus, FileText, Edit, LogOut, User, Home, Image } from "lucide-react"
+import { MediaLibrary } from "@/components/admin/media-library"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -127,6 +128,10 @@ export default function AdminPage() {
               <User className="w-4 h-4 mr-2" />
               Profile
             </TabsTrigger>
+            <TabsTrigger value="media" className="data-[state=active]:bg-[#00ff88] data-[state=active]:text-black">
+              <Image className="w-4 h-4 mr-2" />
+              Media
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="posts">
@@ -176,6 +181,14 @@ export default function AdminPage() {
                 <div className="border-t border-gray-800 pt-8">
                   <ProfileSettingsEditor />
                 </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="media">
+            <div className="bg-[#1a1a1a] rounded-lg border border-gray-800">
+              <div className="p-6">
+                <MediaLibrary />
               </div>
             </div>
           </TabsContent>
