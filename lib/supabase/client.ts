@@ -5,7 +5,7 @@ let clientInstance: any = null
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-export const isSupabaseConfigured = false
+export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey)
 
 export function createClient() {
   if (clientInstance) {
