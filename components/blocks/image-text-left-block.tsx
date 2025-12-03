@@ -32,18 +32,7 @@ export function ImageTextLeftBlock({ content }: ImageTextLeftBlockProps) {
           <div className="order-2">
             {content.title && <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">{content.title}</h2>}
             <div className={`text-gray-300 leading-relaxed text-${content.text_alignment || "left"}`}>
-              {content.content
-                .split("\n")
-                .map(
-                  (paragraph, index) =>
-                    paragraph.trim() && (
-                      <div
-                        key={index}
-                        className="mb-4"
-                        dangerouslySetInnerHTML={{ __html: parseMarkdown(paragraph) }}
-                      />
-                    ),
-                )}
+              <div dangerouslySetInnerHTML={{ __html: parseMarkdown(content.content || '') }} />
             </div>
           </div>
         </div>

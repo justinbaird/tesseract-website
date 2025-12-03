@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import type { HeroBlockContent } from "@/lib/types/page"
+import { parseMarkdown } from "@/lib/utils/markdown"
 
 interface HeroBlockProps {
   content: HeroBlockContent
@@ -30,7 +31,10 @@ export function HeroBlock({ content }: HeroBlockProps) {
         {content.subtitle && <h2 className="text-xl md:text-2xl text-gray-300 mb-8 font-light">{content.subtitle}</h2>}
 
         {content.description && (
-          <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">{content.description}</p>
+          <div 
+            className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: parseMarkdown(content.description) }}
+          />
         )}
 
         {content.buttonText && content.buttonLink && (

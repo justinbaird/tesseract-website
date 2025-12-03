@@ -26,14 +26,9 @@ export function TextBlock({ content }: TextBlockProps) {
         {content.title && <h2 className="text-3xl md:text-4xl font-bold text-white mb-8">{content.title}</h2>}
         <div className="prose prose-lg max-w-none text-gray-300 leading-relaxed">
           {(content.content || content.text)
-            ? (content.content || content.text)
-                .split("\n")
-                .map(
-                  (paragraph, index) =>
-                    paragraph.trim() && (
-                      <div key={index} className="mb-6" dangerouslySetInnerHTML={{ __html: parseMarkdown(paragraph) }} />
-                    ),
-                )
+            ? (
+              <div dangerouslySetInnerHTML={{ __html: parseMarkdown(content.content || content.text || '') }} />
+            )
             : <p className="text-gray-400">No content available</p>
           }
         </div>

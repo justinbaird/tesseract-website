@@ -1,4 +1,8 @@
 export function parseMarkdown(text: string): string {
+  if (!text || !text.trim()) {
+    return ''
+  }
+
   console.log("[v0] Starting markdown parsing for text:", text.substring(0, 100) + "...")
 
   let result = text
@@ -151,19 +155,13 @@ export function parseMarkdown(text: string): string {
     }
   })
 
+  // Process headings FIRST (before other block-level elements)
+  // Headings must be on their own line
+  result = result.replace(/^### (.*)$/gim, '<h3 class="text-xl font-bold text-white mb-3 mt-6">$1</h3>')
+  result = result.replace(/^## (.*)$/gim, '<h2 class="text-2xl font-bold text-white mb-3 mt-6">$1</h2>')
+  result = result.replace(/^# (.*)$/gim, '<h1 class="text-3xl font-bold text-white mb-4 mt-6">$1</h1>')
 
-  // Process headings with better spacing
-  result = result.replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold text-white mb-3 mt-6">$1</h3>')
-  result = result.replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold text-white mb-3 mt-6">$1</h2>')
-  result = result.replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold text-white mb-4 mt-0">$1</h1>')
-
-  // Process bold text
-  result = result.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>')
-
-  // Process italic text
-  result = result.replace(/\*(.*?)\*/g, '<em class="italic text-white">$1</em>')
-
-  // Better list processing - handle multiple lines and proper nesting
+  // Process lists - handle multiple lines and proper nesting
   const lines = result.split('\n')
   const processedLines: string[] = []
   let inList = false
@@ -173,10 +171,14 @@ export function parseMarkdown(text: string): string {
     const line = lines[i]
     const trimmedLine = line.trim()
     
-    // Check if this is a list item
-    if (trimmedLine.match(/^[\*\-] /)) {
-      const listContent = trimmedLine.replace(/^[\*\-] /, '')
-      listItems.push(`<li class="text-white mb-1 ml-4">${listContent}</li>`)
+    // Check if this is a list item (must start with * or - followed by space)
+    if (trimmedLine.match(/^[\*\-]\s+/)) {
+      const listContent = trimmedLine.replace(/^[\*\-]\s+/, '')
+      // Parse inline formatting in list items
+      let formattedContent = listContent
+        .replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em class="italic text-white">$1</em>')
+      listItems.push(`<li class="text-white mb-1 ml-4">${formattedContent}</li>`)
       inList = true
     } else {
       // If we were in a list and now we're not, close the list
@@ -186,7 +188,7 @@ export function parseMarkdown(text: string): string {
         inList = false
       }
       
-      // Add the line (preserve empty lines for paragraph breaks)
+      // Add the line as-is (headings and other elements already processed)
       processedLines.push(line)
     }
   }
@@ -199,19 +201,41 @@ export function parseMarkdown(text: string): string {
   // Rejoin the lines
   result = processedLines.join('\n')
 
+  // Process bold text first (must come before italic to avoid conflicts)
+  result = result.replace(/\*\*([^*]+?)\*\*/g, '<strong class="font-bold text-white">$1</strong>')
+  
+  // Process italic text (single asterisk, but not **)
+  // Only process on lines that don't already contain HTML tags (to avoid processing inside tags)
+  const linesForItalic = result.split('\n')
+  result = linesForItalic.map(line => {
+    // If line already contains HTML tags, skip italic processing
+    if (line.includes('<') && line.includes('>')) {
+      return line
+    }
+    // Process italic on plain text lines
+    return line.replace(/\*([^*]+?)\*/g, '<em class="italic text-white">$1</em>')
+  }).join('\n')
+
   // Now split by double newlines to identify paragraphs
-  const paragraphs = result.split('\n\n')
+  // But preserve structured elements (headings, lists, etc.)
+  const paragraphs = result.split(/\n\n+/)
   result = paragraphs.map(paragraph => {
     const trimmedParagraph = paragraph.trim()
-    if (trimmedParagraph) {
-      // If it's not already a structured element (heading, list, etc.)
-      if (!trimmedParagraph.includes('<h') && !trimmedParagraph.includes('<ul') && !trimmedParagraph.includes('</ul>')) {
-        return `<div class="mb-6">${trimmedParagraph}</div>`
-      }
+    if (!trimmedParagraph) return ''
+    
+    // If it's already a structured element (heading, list, image, video embed), return as-is
+    if (trimmedParagraph.includes('<h') || 
+        trimmedParagraph.includes('<ul') || 
+        trimmedParagraph.includes('</ul>') ||
+        trimmedParagraph.includes('<img') ||
+        trimmedParagraph.includes('<div class="aspect-video') ||
+        trimmedParagraph.includes('<div class="w-full rounded-lg')) {
       return trimmedParagraph
     }
-    return ''
-  }).filter(p => p).join('\n\n')
+    
+    // Otherwise, wrap in paragraph div
+    return `<div class="mb-4 text-gray-300">${trimmedParagraph}</div>`
+  }).filter(p => p).join('\n')
 
   console.log("[v0] Final markdown result:", result.substring(0, 200) + "...")
   return result
