@@ -162,30 +162,24 @@ export function parseMarkdown(text: string): string {
     const trimmed = line.trim()
     
     // Check for H3 first (most specific - 3 hashes)
-    if (trimmed.match(/^###\s+(.+)$/)) {
-      const match = trimmed.match(/^###\s+(.+)$/)
-      if (match) {
-        console.log('[v0] Converting H3 heading:', match[1])
-        return `<h3 class="text-xl font-bold text-white mb-3 mt-6">${match[1]}</h3>`
-      }
+    if (trimmed.startsWith('### ')) {
+      const text = trimmed.substring(4).trim()
+      console.log('[v0] Converting H3 heading:', text)
+      return `<h3 class="text-xl font-bold text-white mb-3 mt-6">${text}</h3>`
     }
     
     // Then H2 (2 hashes, but not 3)
-    if (trimmed.match(/^##\s+(.+)$/) && !trimmed.match(/^###/)) {
-      const match = trimmed.match(/^##\s+(.+)$/)
-      if (match) {
-        console.log('[v0] Converting H2 heading:', match[1])
-        return `<h2 class="text-2xl font-bold text-white mb-3 mt-6">${match[1]}</h2>`
-      }
+    if (trimmed.startsWith('## ') && !trimmed.startsWith('### ')) {
+      const text = trimmed.substring(3).trim()
+      console.log('[v0] Converting H2 heading:', text)
+      return `<h2 class="text-2xl font-bold text-white mb-3 mt-6">${text}</h2>`
     }
     
     // Then H1 (1 hash, but not 2 or 3)
-    if (trimmed.match(/^#\s+(.+)$/) && !trimmed.match(/^##/)) {
-      const match = trimmed.match(/^#\s+(.+)$/)
-      if (match) {
-        console.log('[v0] Converting H1 heading:', match[1])
-        return `<h1 class="text-3xl font-bold text-white mb-4 mt-6">${match[1]}</h1>`
-      }
+    if (trimmed.startsWith('# ') && !trimmed.startsWith('## ')) {
+      const text = trimmed.substring(2).trim()
+      console.log('[v0] Converting H1 heading:', text)
+      return `<h1 class="text-3xl font-bold text-white mb-4 mt-6">${text}</h1>`
     }
     
     return line
@@ -285,8 +279,9 @@ export function parseMarkdown(text: string): string {
     const processedLines: string[] = []
     
     for (const line of lines) {
-      // Check if this line is a heading
+      // Check if this line is a heading (must be exact match - already converted to HTML)
       if (line.startsWith('<h1') || line.startsWith('<h2') || line.startsWith('<h3')) {
+        console.log('[v0] Preserving heading:', line.substring(0, 50))
         processedLines.push(line)
         continue
       }
@@ -314,6 +309,10 @@ export function parseMarkdown(text: string): string {
   
   result = processedParagraphs.filter(p => p).join('\n')
 
+  // Final pass: ensure headings are properly separated and not wrapped
+  // Replace any heading that might have been wrapped incorrectly
+  result = result.replace(/<div class="mb-4 text-gray-300">(<h[1-3][^>]*>.*?<\/h[1-3]>)<\/div>/g, '$1')
+  
   console.log("[v0] Final markdown result:", result.substring(0, 200) + "...")
   return result
 }
