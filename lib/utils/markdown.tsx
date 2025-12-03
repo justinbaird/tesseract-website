@@ -156,10 +156,40 @@ export function parseMarkdown(text: string): string {
   })
 
   // Process headings FIRST (before other block-level elements)
-  // Headings must be on their own line
-  result = result.replace(/^### (.*)$/gim, '<h3 class="text-xl font-bold text-white mb-3 mt-6">$1</h3>')
-  result = result.replace(/^## (.*)$/gim, '<h2 class="text-2xl font-bold text-white mb-3 mt-6">$1</h2>')
-  result = result.replace(/^# (.*)$/gim, '<h1 class="text-3xl font-bold text-white mb-4 mt-6">$1</h1>')
+  // Headings must be on their own line - process in order (H3, H2, H1 to avoid conflicts)
+  const linesForHeadings = result.split('\n')
+  result = linesForHeadings.map(line => {
+    const trimmed = line.trim()
+    
+    // Check for H3 first (most specific - 3 hashes)
+    if (trimmed.match(/^###\s+(.+)$/)) {
+      const match = trimmed.match(/^###\s+(.+)$/)
+      if (match) {
+        console.log('[v0] Converting H3 heading:', match[1])
+        return `<h3 class="text-xl font-bold text-white mb-3 mt-6">${match[1]}</h3>`
+      }
+    }
+    
+    // Then H2 (2 hashes, but not 3)
+    if (trimmed.match(/^##\s+(.+)$/) && !trimmed.match(/^###/)) {
+      const match = trimmed.match(/^##\s+(.+)$/)
+      if (match) {
+        console.log('[v0] Converting H2 heading:', match[1])
+        return `<h2 class="text-2xl font-bold text-white mb-3 mt-6">${match[1]}</h2>`
+      }
+    }
+    
+    // Then H1 (1 hash, but not 2 or 3)
+    if (trimmed.match(/^#\s+(.+)$/) && !trimmed.match(/^##/)) {
+      const match = trimmed.match(/^#\s+(.+)$/)
+      if (match) {
+        console.log('[v0] Converting H1 heading:', match[1])
+        return `<h1 class="text-3xl font-bold text-white mb-4 mt-6">${match[1]}</h1>`
+      }
+    }
+    
+    return line
+  }).join('\n')
 
   // Process lists - handle multiple lines and proper nesting
   const lines = result.split('\n')
@@ -170,6 +200,28 @@ export function parseMarkdown(text: string): string {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     const trimmedLine = line.trim()
+    
+    // Skip empty lines but preserve them
+    if (!trimmedLine) {
+      if (inList && listItems.length > 0) {
+        processedLines.push(`<ul class="list-disc list-outside mb-4 pl-5 space-y-1">${listItems.join('')}</ul>`)
+        listItems = []
+        inList = false
+      }
+      processedLines.push('')
+      continue
+    }
+    
+    // Check if this is already a heading (already processed)
+    if (trimmedLine.startsWith('<h1') || trimmedLine.startsWith('<h2') || trimmedLine.startsWith('<h3')) {
+      if (inList && listItems.length > 0) {
+        processedLines.push(`<ul class="list-disc list-outside mb-4 pl-5 space-y-1">${listItems.join('')}</ul>`)
+        listItems = []
+        inList = false
+      }
+      processedLines.push(trimmedLine)
+      continue
+    }
     
     // Check if this is a list item (must start with * or - followed by space)
     if (trimmedLine.match(/^[\*\-]\s+/)) {
@@ -218,24 +270,49 @@ export function parseMarkdown(text: string): string {
 
   // Now split by double newlines to identify paragraphs
   // But preserve structured elements (headings, lists, etc.)
+  // First, split by double newlines
   const paragraphs = result.split(/\n\n+/)
-  result = paragraphs.map(paragraph => {
+  const processedParagraphs: string[] = []
+  
+  paragraphs.forEach(paragraph => {
     const trimmedParagraph = paragraph.trim()
-    if (!trimmedParagraph) return ''
+    if (!trimmedParagraph) return
     
-    // If it's already a structured element (heading, list, image, video embed), return as-is
-    if (trimmedParagraph.includes('<h') || 
-        trimmedParagraph.includes('<ul') || 
-        trimmedParagraph.includes('</ul>') ||
-        trimmedParagraph.includes('<img') ||
-        trimmedParagraph.includes('<div class="aspect-video') ||
-        trimmedParagraph.includes('<div class="w-full rounded-lg')) {
-      return trimmedParagraph
+    // Split paragraph into lines to check each one
+    const lines = trimmedParagraph.split('\n').map(l => l.trim()).filter(l => l)
+    
+    // Process each line separately to handle headings properly
+    const processedLines: string[] = []
+    
+    for (const line of lines) {
+      // Check if this line is a heading
+      if (line.startsWith('<h1') || line.startsWith('<h2') || line.startsWith('<h3')) {
+        processedLines.push(line)
+        continue
+      }
+      
+      // Check if this line is part of a list
+      if (line.startsWith('<ul') || line.startsWith('</ul>') || line.startsWith('<li')) {
+        processedLines.push(line)
+        continue
+      }
+      
+      // Check if this line is an image or embed
+      if (line.includes('<img') || 
+          line.includes('<div class="aspect-video') || 
+          line.includes('<div class="w-full rounded-lg')) {
+        processedLines.push(line)
+        continue
+      }
+      
+      // Regular text line - wrap it
+      processedLines.push(`<div class="mb-4 text-gray-300">${line}</div>`)
     }
     
-    // Otherwise, wrap in paragraph div
-    return `<div class="mb-4 text-gray-300">${trimmedParagraph}</div>`
-  }).filter(p => p).join('\n')
+    processedParagraphs.push(processedLines.join('\n'))
+  })
+  
+  result = processedParagraphs.filter(p => p).join('\n')
 
   console.log("[v0] Final markdown result:", result.substring(0, 200) + "...")
   return result
